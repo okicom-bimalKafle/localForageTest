@@ -22,7 +22,7 @@ export class UserData {
     this.ip_address = ip_address;
   }
 
-  static create(data: Partial<UserData>): UserData {
+  static create(data: UserData): UserData {
     return new UserData(
       data.id ?? 0,
       data.first_name ?? "",

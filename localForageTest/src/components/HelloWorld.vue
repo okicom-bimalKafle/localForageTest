@@ -100,12 +100,20 @@ const jsonData1 = {
 onMounted(async () => {});
 
 const loadData = async () => {
-  IndexdDB.set(DB_STORE.USERS, "domainUser11", jsonData1);
+  await IndexdDB.set(DB_STORE.USERS, "domainUser22", jsonData1);
 };
 
 const retrieveData = async () => {
-  const data = IndexdDB.get(DB_STORE.USERS, "domainUser11");
-  console.log(data);
+  const key1 = sessionStorage.getItem("salt1");
+  const key2 = sessionStorage.getItem("salt2");
+  const key3 = sessionStorage.getItem("salt3");
+  console.log("Key", key1, key2, key3);
+  if (key1 && key2 && key3) {
+    const data = await IndexdDB.get(DB_STORE.USERS, "domainUser22");
+    console.log(data);
+  } else {
+    console.log("no key");
+  }
 };
 </script>
 

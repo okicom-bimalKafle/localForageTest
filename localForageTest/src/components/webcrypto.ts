@@ -20,7 +20,7 @@ export class WebCrypto {
   }
 
   private static async _getSalt(): Promise<Uint8Array> {
-    const storeSalt = IndexdDB.getCustomerTemp1();
+    const storeSalt = await IndexdDB.getCustomerTemp1();
     if (storeSalt && storeSalt.length) {
       return storeSalt;
     }
@@ -30,7 +30,7 @@ export class WebCrypto {
   }
 
   private static async _getFixedField() {
-    const ff = IndexdDB.getCustomerTemp2();
+    const ff = await IndexdDB.getCustomerTemp2();
     if (ff && ff.length) {
       return ff;
     }
@@ -40,7 +40,7 @@ export class WebCrypto {
   }
 
   private static async _getInvocationField() {
-    const invf = IndexdDB.getCustomerTemp3();
+    const invf = await IndexdDB.getCustomerTemp3();
     if (invf && invf.length) {
       return invf;
     }

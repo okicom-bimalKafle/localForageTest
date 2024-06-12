@@ -3,6 +3,7 @@ import { INDEXEDDB_INFO, DB_STORE, DB_STORE_CLASS_TYPE } from "./indexeddb_api";
 import { WebCrypto, EncryptoData } from "./webcrypto";
 import { UserIndexedDB } from "./user";
 import { usePiniaStore } from "./piniaStore";
+import { UserData } from "./UserModel";
 /**
  * storeName: 保存するデータを示す
  * key: テーブルのkey (domainId)
@@ -65,10 +66,7 @@ export class IndexdDB {
     await Promise.all(
       Object.keys(record).map(async (key: string) => {
         const encrypto = record[key];
-        const decrypto = (await WebCrypto.decrypto(
-          key,
-          encrypto
-        )) as Partial<S>[];
+        const decrypto = (await WebCrypto.decrypto(key, encrypto)) as S[];
         if (decrypto) {
           results[key] = this._restore(storeName, decrypto);
         } else {
@@ -92,7 +90,7 @@ export class IndexdDB {
           return;
         }
         // データ削除
-        await this._crear(db);
+        await this._clear(db);
         // DB削除
         await this._dropDBInstance(db);
 
@@ -155,18 +153,18 @@ export class IndexdDB {
   // TODO: as, anyを使わない型定義の検討
   private static _restore<T extends DB_STORE, S extends DB_STORE_CLASS_TYPE<T>>(
     storeName: T,
-    decrypto: Partial<any>[]
+    decrypto: UserData[] | { data: UserData[] }
   ): S[] {
     switch (storeName) {
       case UserIndexedDB.getStoreName(): {
-        return UserIndexedDB.restore(decrypto) as S[];
+        const data = "data" in decrypto ? decrypto.data : decrypto;
+        return UserIndexedDB.restore(data) as S[];
       }
       default: {
         return [];
       }
     }
   }
-
   // idbにアイテムを書き込み(1組織分) (key: domainId)
   private static async _setItem(
     db: LocalForage,
@@ -227,11 +225,11 @@ export class IndexdDB {
   }
 
   // idbのデータ一括削除
-  private static async _crear(db: LocalForage): Promise<void> {
+  private static async _clear(db: LocalForage): Promise<void> {
     try {
       await db.clear();
     } catch (err) {
-      console.log("_crear", err);
+      console.log("_clear", err);
     }
   }
 
@@ -241,16 +239,16 @@ export class IndexdDB {
   }
 
   /** 暗号化復号化saltの取得 */
-  public static getCustomerTemp1(): Uint8Array {
-    return usePiniaStore().salt1;
+  public static async getCustomerTemp1(): Promise<Uint8Array> {
+    return await usePiniaStore().getSalt1();
   }
 
-  public static getCustomerTemp2(): Uint8Array {
-    return usePiniaStore().salt2;
+  public static async getCustomerTemp2(): Promise<Uint8Array> {
+    return await usePiniaStore().getSalt2();
   }
 
-  public static getCustomerTemp3(): Uint32Array {
-    return usePiniaStore().salt3;
+  public static async getCustomerTemp3(): Promise<Uint32Array> {
+    return await usePiniaStore().getSalt3();
   }
 
   /** 暗号化復号化saltの保存 */
