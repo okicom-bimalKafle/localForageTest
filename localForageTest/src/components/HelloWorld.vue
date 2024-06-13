@@ -4,8 +4,10 @@ import { ref, onMounted } from "vue";
 import { IndexdDB } from "./index";
 import { DB_STORE } from "./indexeddb_api";
 
+import SecureLs from "secure-ls";
 // Define reactive data with explicit type
 const items = ref<UserData[]>([]);
+const ls = ref(new SecureLs());
 defineProps<{ msg: string }>();
 let i = 1;
 
@@ -104,9 +106,9 @@ const loadData = async () => {
 };
 
 const retrieveData = async () => {
-  const key1 = sessionStorage.getItem("salt1");
-  const key2 = sessionStorage.getItem("salt2");
-  const key3 = sessionStorage.getItem("salt3");
+  const key1 = ls.value.get("salt1");
+  const key2 = ls.value.get("salt2");
+  const key3 = ls.value.get("salt3");
   console.log("Key", key1, key2, key3);
   if (key1 && key2 && key3) {
     const data = await IndexdDB.get(DB_STORE.USERS, "domainUser22");

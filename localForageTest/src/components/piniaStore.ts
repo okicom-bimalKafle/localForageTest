@@ -1,37 +1,39 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
+import SecureLs from "secure-ls";
 
 export const usePiniaStore = defineStore("myStore", () => {
   const salt1 = ref<Uint8Array>();
   const salt2 = ref<Uint8Array>();
   const salt3 = ref<Uint32Array>();
+  const ls = ref(new SecureLs());
 
   async function setSalt1(salt: Uint8Array): Promise<void> {
     salt1.value = salt;
-    sessionStorage.setItem("salt1", uint8ArrayToBase64(salt));
+    ls.value.set("salt1", uint8ArrayToBase64(salt));
   }
 
   async function setSalt2(salt: Uint8Array): Promise<void> {
     salt2.value = salt;
-    sessionStorage.setItem("salt2", uint8ArrayToBase64(salt));
+    ls.value.set("salt2", uint8ArrayToBase64(salt));
   }
 
   async function setSalt3(salt: Uint32Array): Promise<void> {
     salt3.value = salt;
-    sessionStorage.setItem("salt3", uint32ArrayToBase64(salt));
+    ls.value.set("salt3", uint32ArrayToBase64(salt));
   }
   async function getSalt1(): Promise<Uint8Array> {
-    const storedSalt = sessionStorage.getItem("salt1");
+    const storedSalt = ls.value.get("salt1");
     return storedSalt ? base64ToUint8Array(storedSalt) : new Uint8Array();
   }
 
   async function getSalt2(): Promise<Uint8Array> {
-    const storedSalt = sessionStorage.getItem("salt2");
+    const storedSalt = ls.value.get("salt2");
     return storedSalt ? base64ToUint8Array(storedSalt) : new Uint8Array();
   }
 
   async function getSalt3(): Promise<Uint32Array> {
-    const storedSalt = sessionStorage.getItem("salt3");
+    const storedSalt = ls.value.get("salt3");
     return storedSalt ? base64ToUint32Array(storedSalt) : new Uint32Array();
   }
   const uint8ArrayToBase64 = (uint8Array: Uint8Array): string => {
